@@ -5,7 +5,9 @@ description = "Add your description here"
 authors = [
     { name = "蔡涛", email = "caitao@zhejianglab.com" }
 ]
-dependencies = []
+dependencies = [
+    "fastapi[all]>=0.104.1",
+]
 readme = "README.md"
 requires-python = ">= 3.8"
 license = { text = "GPL-3.0-only" }

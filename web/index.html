@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Run Python Script</title>
+</head>
+<body>
+
+<h1>Run Python Script</h1>
+
+<form id="params-form">
+    <label for="params">Params:</label>
+    <input type="text" id="params" name="params">
+    <button type="submit">Run</button>
+</form>
+
+<div id="output"></div>
+
+<script>
+    'use strict';
+
+    document.getElementById('params-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const params = document.getElementById('params').value;
+
+        const outputDiv = document.getElementById('output');
+        outputDiv.innerHTML = '<p>Running...</p>';
+
+        const encodedParams = encodeURIComponent(params);
+        const eventSource = new EventSource(`/run?params=${encodedParams}`);
+        eventSource.addEventListener('message', (event) => {
+            outputDiv.innerHTML += `<p>${event.data}</p>`;
+        });
+        eventSource.addEventListener('error', (event) => {
+            outputDiv.innerHTML += '<br><b>Error!</b><br>';
+            eventSource.close();
+        });
+        eventSource.addEventListener('done', (event) => {
+            outputDiv.innerHTML += '<br><b>Done!</b><br>';
+            eventSource.close();
+        })
+        window.onbeforeunload = () => {
+            eventSource.close();
+        }
+    })
+</script>
+
+</body>
+</html>
