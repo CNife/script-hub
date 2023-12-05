@@ -2,41 +2,164 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewpoint">
     <title>Run Python Script</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            background: white;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .submit-button {
+            background-color: #5c6bc0;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .submit-button:hover {
+            background-color: #3949ab;
+        }
+
+        label {
+            display: block;
+            color: #333;
+        }
+
+        .terminal {
+            background: #232323;
+            color: #FFFFFF;
+            font-family: monospace;
+            padding: 10px;
+            overflow-y: scroll;
+            height: 500px;
+            white-space: pre-wrap;
+        }
+
+        .line {
+            display: flex;
+        }
+
+        .line-no {
+            color: #888;
+            padding-right: 10px;
+            text-align: right;
+            width: 50px;
+        }
+
+        .line-content {
+            flex-grow: 1;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Run Python Script</h1>
+<h1>Convert To Precomputed</h1>
 
 <form id="params-form">
-    <label for="params">Params:</label>
-    <input type="text" id="params" name="params">
-    <button type="submit">Run</button>
+    <label for="imagePath">Image Path (/path/to/image)</label>
+    <input id="imagePath" name="imagePath" required type="text"><br><br>
+
+    <label for="outputDirectory">Output Directory (/path/to/outputDir)</label>
+    <input id="outputDirectory" name="outputDirectory" required type="text"><br><br>
+
+    <label for="resolutionX">Resolution X (nm)</label>
+    <input id="resolutionX" name="resolutionX" required type="number"><br><br>
+    <label for="resolutionY">Resolution Y (nm)</label>
+    <input id="resolutionY" name="resolutionY" required type="number"><br><br>
+    <label for="resolutionZ">Resolution Z (nm)</label>
+    <input id="resolutionZ" name="resolutionZ" required type="number"><br><br>
+
+    <label for="writeBlockSize">Write Block Size (default 512)</label>
+    <input id="writeBlockSize" name="writeBlockSize" required type="number"><br><br>
+
+    <label for="resume">Resume</label>
+    <select id="resume" name="resume">
+        <option selected value="true">Resume (default)</option>
+        <option value="false">Start New</option>
+    </select><br><br>
+
+    <input type="submit" value="Convert">
 </form>
 
-<div id="output"></div>
+<div class="terminal" id="terminal"></div>
 
 <script>
     'use strict';
 
+    function addLine(line) {
+        const terminalDiv = document.getElementById('terminal');
+        const lineElement = document.createElement('div');
+        lineElement.className = 'line';
+
+        const lineNumber = terminalDiv.childNodes.length + 1;
+        const lineNoSpan = document.createElement('span');
+        lineNoSpan.className = 'line-no';
+        lineNoSpan.textContent = lineNumber + ':';
+        lineElement.appendChild(lineNoSpan);
+
+        const lineContentSpan = document.createElement('span');
+        lineContentSpan.className = 'line-content';
+        lineContentSpan.textContent = line;
+        lineElement.appendChild(lineContentSpan);
+
+        terminalDiv.appendChild(lineElement);
+        terminalDiv.scrollTop = terminalDiv.scrollHeight;
+    }
+
     document.getElementById('params-form').addEventListener('submit', (event) => {
         event.preventDefault();
-        const params = document.getElementById('params').value;
 
-        const outputDiv = document.getElementById('output');
-        outputDiv.innerHTML = '<p>Running...</p>';
+        const formData = new FormData(event.target);
+        const params = {
+            imagePath: formData.get('imagePath'),
+            outputDirectory: formData.get('outputDirectory'),
+            resolutionX: formData.get('resolutionX'),
+            resolutionY: formData.get('resolutionY'),
+            resolutionZ: formData.get('resolutionZ'),
+            writeBlockSize: formData.get('writeBlockSize'),
+            resume: formData.get('resume'),
+        };
+        const queryParams = Object.entries(params).map(([key, value]) =>
+            encodeURIComponent(key) + '=' + encodeURIComponent(value)).join('&');
 
-        const encodedParams = encodeURIComponent(params);
-        const eventSource = new EventSource(`/run?params=${encodedParams}`);
+        const eventSource = new EventSource('/run?' + queryParams);
         eventSource.addEventListener('message', (event) => {
-            outputDiv.innerHTML += `<p>${event.data}</p>`;
-        });
+            addLine(event.data);
+        })
         eventSource.addEventListener('error', (event) => {
-            outputDiv.innerHTML += '<br><b>Error!</b><br>';
+            addLine('Error!');
             eventSource.close();
-        });
+        })
         eventSource.addEventListener('done', (event) => {
-            outputDiv.innerHTML += '<br><b>Done!</b><br>';
+            addLine('Done!');
             eventSource.close();
         })
         window.onbeforeunload = () => {
