@@ -53,18 +53,14 @@ def get_image_size_v2(image_info: ZImgInfo) -> SizePM:
 def get_image_resolution(image_info: ZImgInfo) -> ImageResolution:
     scale = _unit_scale(image_info.voxelSizeUnit)
     return ImageResolution(
-        x=image_info.voxelSizeX * scale,
-        y=image_info.voxelSizeY * scale,
-        z=image_info.voxelSizeZ * scale,
+        x=image_info.voxelSizeX * scale, y=image_info.voxelSizeY * scale, z=image_info.voxelSizeZ * scale
     )
 
 
 def get_image_resolution_v2(image_info: ZImgInfo) -> ResolutionPM:
     scale = _unit_scale(image_info.voxelSizeUnit)
     return ResolutionPM(
-        x=image_info.voxelSizeX * scale,
-        y=image_info.voxelSizeY * scale,
-        z=image_info.voxelSizeZ * scale,
+        x=image_info.voxelSizeX * scale, y=image_info.voxelSizeY * scale, z=image_info.voxelSizeZ * scale
     )
 
 
@@ -84,9 +80,7 @@ def get_image_dtype(image_info: ZImgInfo) -> np.dtype:
     return np.dtype(image_info.dataTypeString())
 
 
-def read_image_data(
-    image_path: OsPath | Iterable[OsPath], region: ImageRegion, ratio: ResolutionRatio
-) -> ndarray:
+def read_image_data(image_path: OsPath | Iterable[OsPath], region: ImageRegion, ratio: ResolutionRatio) -> ndarray:
     zimg_region = _region_2_zimg(region)
     zimg_ratio_dict = _ratio_2_dict(ratio)
     if isinstance(image_path, Iterable):
@@ -117,8 +111,7 @@ def read_image_data_v2(
 ) -> ndarray:
     image_path = Path(image_path)
     zimg_region = ZImgRegion(
-        ZVoxelCoordinate(x_start, y_start, z_start, 0, 0),
-        ZVoxelCoordinate(x_end, y_end, z_end, -1, -1),
+        ZVoxelCoordinate(x_start, y_start, z_start, 0, 0), ZVoxelCoordinate(x_end, y_end, z_end, -1, -1)
     )
     if image_path.is_dir():
         image_paths = [str(path) for path in image_path.iterdir() if path.is_file()]
@@ -132,13 +125,7 @@ def read_image_data_v2(
             zRatio=z_ratio,
         )
     else:
-        zimg = ZImg(
-            str(image_path),
-            region=zimg_region,
-            xRatio=x_ratio,
-            yRatio=y_ratio,
-            zRatio=z_ratio,
-        )
+        zimg = ZImg(str(image_path), region=zimg_region, xRatio=x_ratio, yRatio=y_ratio, zRatio=z_ratio)
     return zimg.data[0].copy(order="C")
 
 

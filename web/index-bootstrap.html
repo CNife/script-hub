@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Convert Data</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" rel="stylesheet">
+    <style>
+        .terminal {
+            background: #232323;
+            color: #FFFFFF;
+            font-family: monospace;
+            padding: 10px;
+            overflow-y: scroll;
+            position: sticky;
+            top: 100%;
+            height: 500px;
+        }
+
+        .line {
+            display: flex;
+        }
+
+        .line-no {
+            color: #888;
+            padding-right: 10px;
+            text-align: right;
+            width: 50px;
+        }
+
+        .line-content {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 标题栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Convert To Precomputed</a>
+        <button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+                data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>
+
+<!-- 页面的主体部分 -->
+<div class="container-fluid mt-3">
+    <div class="row">
+        <!-- 侧边栏 -->
+        <div class="col-md-2">
+            <div aria-orientation="vertical" class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
+                <a aria-controls="v-pills-home" aria-selected="true" class="nav-link active"
+                   data-bs-target="#v-pills-home"
+                   data-bs-toggle="pill" id="v-pills-home-tab" role="tab">Simple Image</a>
+                <a aria-controls="v-pills-profile" aria-selected="false" class="nav-link"
+                   data-bs-target="#v-pills-profile"
+                   data-bs-toggle="pill" id="v-pills-profile-tab" role="tab">Labeled Image</a>
+            </div>
+        </div>
+        <!-- 主内容区 -->
+        <div class="col-md-10">
+            <div class="tab-content" id="v-pills-tabContent">
+                <!-- Simple的内容 -->
+                <div aria-labelledby="v-pills-home-tab" class="tab-pane fade show active" id="v-pills-home"
+                     role="tabpanel">
+
+                    <h1 class="my-4">Convert To Precomputed</h1>
+
+                    <form class="row g-3" id="simple-image-params-form">
+                        <div class="col-6">
+                            <label class="form-label" for="simple-image-path">Image Path (/path/to/image)</label>
+                            <input class="form-control" id="simple-image-path" name="image_path" required type="text">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="outputDirectory">Output Directory
+                                (/path/to/outputDir)</label>
+                            <input class="form-control" id="outputDirectory" name="output_directory" required type="text">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="resolutionX">Resolution X (nm)</label>
+                            <input class="form-control" id="resolutionX" name="resolution_x" required type="number">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="resolutionY">Resolution Y (nm)</label>
+                            <input class="form-control" id="resolutionY" name="resolution_y" required type="number">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="resolutionZ">Resolution Z (nm)</label>
+                            <input class="form-control" id="resolutionZ" name="resolution_z" required type="number">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="writeBlockSize">Write Block Size (default 1024)</label>
+                            <input class="form-control" id="writeBlockSize" name="write_block_size" type="number">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="resume">Resume</label>
+                            <select class="form-select" id="resume" name="resume">
+                                <option selected value="true">Resume (default)</option>
+                                <option value="false">Start New</option>
+                            </select>
+                        </div>
+                        <div class="col-12 text-center">
+                            <input class="btn btn-primary" type="submit" value="Convert">
+                        </div>
+                    </form>
+
+                    <div class="terminal" id="simple-image-terminal" style="margin-top: 10px"></div>
+                </div>
+                <!-- 子页面2的内容 -->
+                <div aria-labelledby="v-pills-profile-tab" class="tab-pane fade" id="v-pills-profile" role="tabpanel">
+                    <h2>子页面2</h2>
+                    <p>这里是子页面2的内容...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script crossorigin="anonymous"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/web/main.js"></script>
+<script>
+    registerEventSource("simple-image-params-form", "simple-image-terminal", "/api/convert-simple-image");
+</script>
+</body>
+</html>

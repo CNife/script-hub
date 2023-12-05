@@ -151,7 +151,7 @@
                 writeBlockSize: formData.get('writeBlockSize'),
                 resume: formData.get('resume'),
             };
-            const queryParams = Object.entries(params).filter(([_, value]) => value && value.trim() != '').map(([key, value]) =>
+            const queryParams = Object.entries(params).filter(([_, value]) => value && value.trim() !== '').map(([key, value]) =>
                 encodeURIComponent(key) + '=' + encodeURIComponent(value)).join('&');
 
             const eventSource = new EventSource('/run?' + queryParams);

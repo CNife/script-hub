@@ -1,41 +1,38 @@
 import os.path
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 from typing import Iterator, Annotated
 
 from fastapi import FastAPI, Query
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import StreamingResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 CWD: Path = Path(__file__).parent.parent.parent
 
 app = FastAPI()
 
+app.mount("/web", StaticFiles(directory=CWD / "web"), name="web")
+
 
 @app.get("/")
 def index():
-    return FileResponse(CWD / "web" / "index.html")
+    return RedirectResponse("/web/index-bootstrap.html")
 
 
-@app.get("/run")
-def run(
-    image_path: Annotated[str, Query(alias="imagePath")],
-    output_directory: Annotated[str, Query(alias="outputDirectory")],
-    resolution_x: Annotated[int, Query(alias="resolutionX")],
-    resolution_y: Annotated[int, Query(alias="resolutionY")],
-    resolution_z: Annotated[int, Query(alias="resolutionZ")],
-    resume: Annotated[bool, Query(alias="resume")],
-    write_block_size: Annotated[int, Query(alias="writeBlockSize")] = 1024,
+@app.get("/api/convert-simple-image")
+def convert_simple_image(
+    image_path: Annotated[str, Query()],
+    output_directory: Annotated[str, Query()],
+    resolution_x: Annotated[int, Query()],
+    resolution_y: Annotated[int, Query()],
+    resolution_z: Annotated[int, Query()],
+    resume: Annotated[bool, Query()],
+    write_block_size: Annotated[int, Query()] = 1024,
 ):
     return StreamingResponse(
         execute_script(
-            image_path,
-            output_directory,
-            resolution_x,
-            resolution_y,
-            resolution_z,
-            write_block_size,
-            resume,
+            image_path, output_directory, resolution_x, resolution_y, resolution_z, write_block_size, resume
         ),
         media_type="text/event-stream",
     )

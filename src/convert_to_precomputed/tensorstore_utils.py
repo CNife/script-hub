@@ -28,9 +28,7 @@ DEFAULT_SHARDING_ARG: JsonObject = {
 }
 
 
-def build_scales_dyadic_pyramid(
-    resolution: ImageResolution | ResolutionPM, size: ImageSize
-) -> list[TsScaleMetadata]:
+def build_scales_dyadic_pyramid(resolution: ImageResolution | ResolutionPM, size: ImageSize) -> list[TsScaleMetadata]:
     init_scale_info = {
         "encoding": "raw",
         "sharding": DEFAULT_SHARDING_ARG,
@@ -42,9 +40,7 @@ def build_scales_dyadic_pyramid(
     target_chunk_size = 64
     assert math.log2(target_chunk_size).is_integer()
     max_scales = round(math.log2(target_chunk_size)) + 1
-    fill_scales_for_dyadic_pyramid(
-        info_dict, target_chunk_size=target_chunk_size, max_scales=max_scales
-    )
+    fill_scales_for_dyadic_pyramid(info_dict, target_chunk_size=target_chunk_size, max_scales=max_scales)
     return info_dict["scales"]
 
 
@@ -53,12 +49,8 @@ def build_multiscale_metadata(dtype: np.dtype, num_channels: int) -> JsonObject:
     return {"data_type": str(dtype), "num_channels": num_channels, "type": "image"}
 
 
-def build_multiscale_metadata_v2(
-    data_type: str | np.dtype, num_channels: int
-) -> MultiscaleMetadata:
-    return MultiscaleMetadata(
-        data_type=str(data_type), num_channels=num_channels, type="image"
-    )
+def build_multiscale_metadata_v2(data_type: str | np.dtype, num_channels: int) -> MultiscaleMetadata:
+    return MultiscaleMetadata(data_type=str(data_type), num_channels=num_channels, type="image")
 
 
 def scale_resolution_ratio(
@@ -73,10 +65,7 @@ def scale_resolution_ratio(
 
 
 def open_tensorstore_to_write(
-    channel_name: str,
-    output_directory: Path,
-    scale: TsScaleMetadata,
-    multi_scale_metadata: JsonObject,
+    channel_name: str, output_directory: Path, scale: TsScaleMetadata, multi_scale_metadata: JsonObject
 ) -> ts.TensorStore:
     scale_metadata = {k: v for k, v in scale.items() if k != "chunk_sizes"}
     spec = {

@@ -78,9 +78,7 @@ def image_2_precomputed(
         z_end = size.z
     logger.info(f"{z_start=}, {z_end=}")
 
-    base_dict = build_ng_base_json(
-        image_info.channelColors, resolution, size, data_type, url_path, base_url
-    )
+    base_dict = build_ng_base_json(image_info.channelColors, resolution, size, data_type, url_path, base_url)
     dump_json(base_dict, output_directory / "base.json")
     logger.info(f"base_json_dict={base_dict}")
     logger.info(f"dump base.json to {str(output_directory / 'base.json')}")
@@ -129,9 +127,7 @@ def build_ng_base_json(
                 "shaderControls": {
                     "color": f"#{channel_color.r:02x}{channel_color.g:02x}{channel_color.b:02x}",
                     "normalized": {
-                        "range": [0.0, 1.0]
-                        if dtype.kind == "f"
-                        else [np.iinfo(dtype).min, np.iinfo(dtype).max]
+                        "range": [0.0, 1.0] if dtype.kind == "f" else [np.iinfo(dtype).min, np.iinfo(dtype).max]
                     },
                 },
             }
@@ -159,30 +155,17 @@ def convert_single_scale(
         z_range_progress = ChainedProgress("z_range", None)
     else:
         z_range_progress = scale_progress.get_or_add("z_range")
-    for read_z_range in z_range_progress.bind(
-        read_z_ranges, lambda zr: f"{zr.start}-{zr.end}"
-    ):
+    for read_z_range in z_range_progress.bind(read_z_ranges, lambda zr: f"{zr.start}-{zr.end}"):
         read_z_start, read_z_end = astuple(read_z_range)
 
         with log_time_usage(f"{z_range_progress} read image data"):
             image_data = read_image_data_v2(
-                image_path,
-                0,
-                -1,
-                0,
-                -1,
-                read_z_start,
-                read_z_end,
-                ratio.x,
-                ratio.y,
-                ratio.z,
+                image_path, 0, -1, 0, -1, read_z_start, read_z_end, ratio.x, ratio.y, ratio.z
             )
         image_data = convert_image_data(image_data)
 
         channel_progress = z_range_progress.get_or_add("channel")
-        for channel_index, channel_data in channel_progress.bind(
-            list(enumerate(image_data))
-        ):
+        for channel_index, channel_data in channel_progress.bind(list(enumerate(image_data))):
             write_tensorstore(
                 channel_index,
                 channel_data,
@@ -211,9 +194,7 @@ def write_tensorstore(
 ):
     channel_name = f"channel_{channel_index}"
     channel_data = channel_data.transpose()
-    ts_writer = open_tensorstore_to_write(
-        channel_name, output_directory, scale, multi_scale_metadata
-    )
+    ts_writer = open_tensorstore_to_write(channel_name, output_directory, scale, multi_scale_metadata)
 
     xy_range_progress = channel_progress.get_or_add("xy_range")
     for x_range, y_range in xy_range_progress.bind(
@@ -226,17 +207,12 @@ def write_tensorstore(
         lambda xyr: f"({xyr[0].start},{xyr[1].start})-({xyr[0].end},{xyr[1].end})",
     ):
         write_range = ts.d["channel", "x", "y", "z"][
-            channel_index,
-            x_range.start : x_range.end,
-            y_range.start : y_range.end,
-            write_z_start:write_z_end,
+            channel_index, x_range.start : x_range.end, y_range.start : y_range.end, write_z_start:write_z_end
         ]
         if write_status_json:
             xy_range_progress.save(output_directory / "work_status.json")
         with log_time_usage(f"{xy_range_progress} write data"):
-            ts_writer[write_range] = channel_data[
-                x_range.start : x_range.end, y_range.start : y_range.end
-            ]
+            ts_writer[write_range] = channel_data[x_range.start : x_range.end, y_range.start : y_range.end]
 
 
 def load_work_progress(resume: bool, output_directory: Path) -> ChainedProgress:
@@ -246,10 +222,7 @@ def load_work_progress(resume: bool, output_directory: Path) -> ChainedProgress:
 
 
 def calc_ranges(start: int, end: int, step: int) -> list[DimensionRange]:
-    return [
-        DimensionRange(start, min(end, start + step))
-        for start in range(start, end, step)
-    ]
+    return [DimensionRange(start, min(end, start + step)) for start in range(start, end, step)]
 
 
 def convert_image_data(data: ndarray) -> ndarray:
