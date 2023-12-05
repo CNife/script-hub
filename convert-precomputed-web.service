@@ -6,7 +6,7 @@ After=network.target
 User=cnife
 Group=cnife
 WorkingDirectory=/home/cnife/code/convert_precomputed_web
-ExecStart=/home/cnife/code/convert_precomputed_web/bootstrap.sh
+ExecStart=bash /home/cnife/code/convert_precomputed_web/bootstrap.sh
 Restart=always
 RestartSec=5
 
