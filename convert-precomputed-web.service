@@ -1,0 +1,14 @@
+[Unit]
+Description=Convert Precomputed Web Service
+After=network.target
+
+[Service]
+User=cnife
+Group=cnife
+WorkingDirectory=/home/cnife/code/convert_precomputed_web
+ExecStart=/home/cnife/code/convert_precomputed_web/bootstrap.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
