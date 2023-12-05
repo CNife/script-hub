@@ -47,7 +47,9 @@ JsonNull: TypeAlias = type(None)
 JsonBoolean: TypeAlias = bool
 JsonArray: TypeAlias = list["Json"]
 JsonObject: TypeAlias = dict[JsonString, "Json"]
-Json: TypeAlias = JsonString | JsonNumber | JsonNull | JsonBoolean | JsonArray | JsonObject
+Json: TypeAlias = (
+    JsonString | JsonNumber | JsonNull | JsonBoolean | JsonArray | JsonObject
+)
 
 TsScaleMetadata: TypeAlias = JsonObject
 

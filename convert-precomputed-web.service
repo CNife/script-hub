@@ -6,7 +6,8 @@ After=network.target
 User=cnife
 Group=cnife
 WorkingDirectory=/home/cnife/code/convert_precomputed_web
-ExecStart=bash /home/cnife/code/convert_precomputed_web/bootstrap.sh
+Environment="PYTHONPATH=/home/cnife/code/convert_precomputed_web/src"
+ExecStart=/home/cnife/.miniconda3/envs/convert-precomputed-web/bin/python -m uvicorn convert_precomputed_web.main:app --host 0.0.0.0 --port 2100
 Restart=always
 RestartSec=5
 

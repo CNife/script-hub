@@ -1,4 +1,5 @@
 import os.path
+from pathlib import Path
 import subprocess
 import sys
 from typing import Iterator, Annotated
@@ -6,12 +7,14 @@ from typing import Iterator, Annotated
 from fastapi import FastAPI, Query
 from fastapi.responses import FileResponse, StreamingResponse
 
+CWD: Path = Path(__file__).parent.parent.parent
+
 app = FastAPI()
 
 
 @app.get("/")
 def index():
-    return FileResponse("web/index.html")
+    return FileResponse(CWD / "web" / "index.html")
 
 
 @app.get("/run")
@@ -21,12 +24,18 @@ def run(
     resolution_x: Annotated[int, Query(alias="resolutionX")],
     resolution_y: Annotated[int, Query(alias="resolutionY")],
     resolution_z: Annotated[int, Query(alias="resolutionZ")],
-    write_block_size: Annotated[int, Query(alias="writeBlockSize")],
     resume: Annotated[bool, Query(alias="resume")],
+    write_block_size: Annotated[int, Query(alias="writeBlockSize")] = 1024,
 ):
     return StreamingResponse(
         execute_script(
-            image_path, output_directory, resolution_x, resolution_y, resolution_z, write_block_size, resume
+            image_path,
+            output_directory,
+            resolution_x,
+            resolution_y,
+            resolution_z,
+            write_block_size,
+            resume,
         ),
         media_type="text/event-stream",
     )
@@ -42,28 +51,36 @@ def execute_script(
     resume: bool,
 ) -> Iterator[str]:
     base_path = "/zjbs-data/share"
-    process = subprocess.Popen(
+    cmd = [
+        sys.executable,
+        "-m",
+        "convert_to_precomputed",
+        "convert",
+        "--base-url",
+        "http://10.11.140.35:2000",
+        "--base-path",
+        base_path,
+    ]
+    if write_block_size is not None:
+        cmd.append("--write-block-size")
+        cmd.append(str(write_block_size))
+    cmd.extend(
         [
-            sys.executable,
-            "-m",
-            "convert_precomputed",
-            "convert" "--write-block-size",
-            str(write_block_size),
             "--resume" if resume else "--no-resume",
-            "--base-url",
-            "http://10.11.140.35:2000",
-            "--base-path",
-            os.path.join(base_path, image_path),
-            os.path.join(base_path, output_directory),
+            os.path.join(base_path, image_path.lstrip("/")),
+            os.path.join(base_path, output_directory.lstrip("/")),
             str(resolution_x),
             str(resolution_y),
             str(resolution_z),
-        ],
+        ]
+    )
+    process = subprocess.Popen(
+        cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
         encoding="UTF-8",
-        env={"PYTHONPATH": os.path.join(__file__, "..", "..")},
+        env={"PYTHONPATH": str(CWD / "src")},
     )
     for line in process.stdout:
         yield f"data: {line}\n\n"

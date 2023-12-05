@@ -25,7 +25,9 @@ class ChainedProgress:
         self.children.append(child)
         return child
 
-    def bind(self, seq: Sequence[T], gen_desc: Callable[[T], str] | None = None) -> "ChainedProgressIter[T]":
+    def bind(
+        self, seq: Sequence[T], gen_desc: Callable[[T], str] | None = None
+    ) -> "ChainedProgressIter[T]":
         return ChainedProgressIter(self, seq, gen_desc)
 
     def __str__(self) -> str:
@@ -40,7 +42,9 @@ class ChainedProgress:
             f"description={self.description!r},parent={self.parent},children={self.children})"
         )
 
-    def save(self, path: OsPath, backtrack_to_root: bool = True, step_back: bool = True) -> None:
+    def save(
+        self, path: OsPath, backtrack_to_root: bool = True, step_back: bool = True
+    ) -> None:
         def serial_to_dict(progress: ChainedProgress):
             return {
                 "name": progress.name,
@@ -58,13 +62,17 @@ class ChainedProgress:
 
     @staticmethod
     def load(path: OsPath) -> "ChainedProgress":
-        def load_from_dict(d: JsonObject, parent: ChainedProgress | None) -> ChainedProgress:
+        def load_from_dict(
+            d: JsonObject, parent: ChainedProgress | None
+        ) -> ChainedProgress:
             progress = ChainedProgress(d["name"], None)
             progress.index = d["index"]
             progress.count = d["count"]
             progress.description = d["description"]
             progress.parent = parent
-            progress.children = [load_from_dict(child_dict, progress) for child_dict in d["children"]]
+            progress.children = [
+                load_from_dict(child_dict, progress) for child_dict in d["children"]
+            ]
             return progress
 
         with open(path, "r") as f:
@@ -73,7 +81,12 @@ class ChainedProgress:
 
 
 class ChainedProgressIter(Iterator[T]):
-    def __init__(self, progress: ChainedProgress, seq: Sequence[T], gen_desc: Callable[[T], str] | None):
+    def __init__(
+        self,
+        progress: ChainedProgress,
+        seq: Sequence[T],
+        gen_desc: Callable[[T], str] | None,
+    ):
         self.progress: ChainedProgress = progress
         self.seq: Sequence[T] = seq
         self.gen_desc: Callable[[T], str] = gen_desc

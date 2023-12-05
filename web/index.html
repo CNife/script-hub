@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewpoint">
@@ -25,7 +26,9 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        input[type="text"], input[type="number"], select {
+        input[type="text"],
+        input[type="number"],
+        select {
             width: calc(100% - 22px);
             padding: 10px;
             margin-bottom: 15px;
@@ -79,94 +82,96 @@
         }
     </style>
 </head>
+
 <body>
 
-<h1>Convert To Precomputed</h1>
+    <h1>Convert To Precomputed</h1>
 
-<form id="params-form">
-    <label for="imagePath">Image Path (/path/to/image)</label>
-    <input id="imagePath" name="imagePath" required type="text"><br><br>
+    <form id="params-form">
+        <label for="imagePath">Image Path (/path/to/image)</label>
+        <input id="imagePath" name="imagePath" required type="text"><br><br>
 
-    <label for="outputDirectory">Output Directory (/path/to/outputDir)</label>
-    <input id="outputDirectory" name="outputDirectory" required type="text"><br><br>
+        <label for="outputDirectory">Output Directory (/path/to/outputDir)</label>
+        <input id="outputDirectory" name="outputDirectory" required type="text"><br><br>
 
-    <label for="resolutionX">Resolution X (nm)</label>
-    <input id="resolutionX" name="resolutionX" required type="number"><br><br>
-    <label for="resolutionY">Resolution Y (nm)</label>
-    <input id="resolutionY" name="resolutionY" required type="number"><br><br>
-    <label for="resolutionZ">Resolution Z (nm)</label>
-    <input id="resolutionZ" name="resolutionZ" required type="number"><br><br>
+        <label for="resolutionX">Resolution X (nm)</label>
+        <input id="resolutionX" name="resolutionX" required type="number"><br><br>
+        <label for="resolutionY">Resolution Y (nm)</label>
+        <input id="resolutionY" name="resolutionY" required type="number"><br><br>
+        <label for="resolutionZ">Resolution Z (nm)</label>
+        <input id="resolutionZ" name="resolutionZ" required type="number"><br><br>
 
-    <label for="writeBlockSize">Write Block Size (default 512)</label>
-    <input id="writeBlockSize" name="writeBlockSize" required type="number"><br><br>
+        <label for="writeBlockSize">Write Block Size (default 512)</label>
+        <input id="writeBlockSize" name="writeBlockSize" type="number"><br><br>
 
-    <label for="resume">Resume</label>
-    <select id="resume" name="resume">
-        <option selected value="true">Resume (default)</option>
-        <option value="false">Start New</option>
-    </select><br><br>
+        <label for="resume">Resume</label>
+        <select id="resume" name="resume">
+            <option selected value="true">Resume (default)</option>
+            <option value="false">Start New</option>
+        </select><br><br>
 
-    <input type="submit" value="Convert">
-</form>
+        <input type="submit" value="Convert">
+    </form>
 
-<div class="terminal" id="terminal"></div>
+    <div class="terminal" id="terminal"></div>
 
-<script>
-    'use strict';
+    <script>
+        'use strict';
 
-    function addLine(line) {
-        const terminalDiv = document.getElementById('terminal');
-        const lineElement = document.createElement('div');
-        lineElement.className = 'line';
+        function addLine(line) {
+            const terminalDiv = document.getElementById('terminal');
+            const lineElement = document.createElement('div');
+            lineElement.className = 'line';
 
-        const lineNumber = terminalDiv.childNodes.length + 1;
-        const lineNoSpan = document.createElement('span');
-        lineNoSpan.className = 'line-no';
-        lineNoSpan.textContent = lineNumber + ':';
-        lineElement.appendChild(lineNoSpan);
+            const lineNumber = terminalDiv.childNodes.length + 1;
+            const lineNoSpan = document.createElement('span');
+            lineNoSpan.className = 'line-no';
+            lineNoSpan.textContent = lineNumber + ':';
+            lineElement.appendChild(lineNoSpan);
 
-        const lineContentSpan = document.createElement('span');
-        lineContentSpan.className = 'line-content';
-        lineContentSpan.textContent = line;
-        lineElement.appendChild(lineContentSpan);
+            const lineContentSpan = document.createElement('span');
+            lineContentSpan.className = 'line-content';
+            lineContentSpan.textContent = line;
+            lineElement.appendChild(lineContentSpan);
 
-        terminalDiv.appendChild(lineElement);
-        terminalDiv.scrollTop = terminalDiv.scrollHeight;
-    }
-
-    document.getElementById('params-form').addEventListener('submit', (event) => {
-        event.preventDefault();
-
-        const formData = new FormData(event.target);
-        const params = {
-            imagePath: formData.get('imagePath'),
-            outputDirectory: formData.get('outputDirectory'),
-            resolutionX: formData.get('resolutionX'),
-            resolutionY: formData.get('resolutionY'),
-            resolutionZ: formData.get('resolutionZ'),
-            writeBlockSize: formData.get('writeBlockSize'),
-            resume: formData.get('resume'),
-        };
-        const queryParams = Object.entries(params).map(([key, value]) =>
-            encodeURIComponent(key) + '=' + encodeURIComponent(value)).join('&');
-
-        const eventSource = new EventSource('/run?' + queryParams);
-        eventSource.addEventListener('message', (event) => {
-            addLine(event.data);
-        })
-        eventSource.addEventListener('error', (event) => {
-            addLine('Error!');
-            eventSource.close();
-        })
-        eventSource.addEventListener('done', (event) => {
-            addLine('Done!');
-            eventSource.close();
-        })
-        window.onbeforeunload = () => {
-            eventSource.close();
+            terminalDiv.appendChild(lineElement);
+            terminalDiv.scrollTop = terminalDiv.scrollHeight;
         }
-    })
-</script>
+
+        document.getElementById('params-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const params = {
+                imagePath: formData.get('imagePath'),
+                outputDirectory: formData.get('outputDirectory'),
+                resolutionX: formData.get('resolutionX'),
+                resolutionY: formData.get('resolutionY'),
+                resolutionZ: formData.get('resolutionZ'),
+                writeBlockSize: formData.get('writeBlockSize'),
+                resume: formData.get('resume'),
+            };
+            const queryParams = Object.entries(params).filter(([_, value]) => value && value.trim() != '').map(([key, value]) =>
+                encodeURIComponent(key) + '=' + encodeURIComponent(value)).join('&');
+
+            const eventSource = new EventSource('/run?' + queryParams);
+            eventSource.addEventListener('message', (event) => {
+                addLine(event.data);
+            })
+            eventSource.addEventListener('error', (event) => {
+                addLine('Error!');
+                eventSource.close();
+            })
+            eventSource.addEventListener('done', (event) => {
+                addLine('Done!');
+                eventSource.close();
+            })
+            window.onbeforeunload = () => {
+                eventSource.close();
+            }
+        })
+    </script>
 
 </body>
+
 </html>
