@@ -25,11 +25,12 @@ function addTerminalLine(terminalId, line) {
 
 function getFormData(form) {
     const formData = {};
-    const inputs = form.elements;
-    for (let i = 0; i < inputs.length; i++) {
-        const input = inputs[i];
-        if (input.name && input.type !== 'submit' && input.type !== 'button' && input.type !== 'reset') {
-            formData[input.name] = input.value; // 设置对象的 key/value
+    for (const input of form.elements) {
+        if (!input.name || input.type === 'submit') continue;
+        if (input.type === 'checkbox') {
+            formData[input.name] = input.checked;
+        } else if (input.type !== 'radio' || input.checked) {
+            formData[input.name] = input.value;
         }
     }
     return formData;
@@ -37,7 +38,7 @@ function getFormData(form) {
 
 function makeQueryParams(formData) {
     return Object.entries(formData)
-        .filter(([_, value]) => value && value.trim() !== '')
+        .filter(([_, value]) => value !== null && value !== undefined && String(value).trim() !== '')
         .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(value))
         .join('&');
 }

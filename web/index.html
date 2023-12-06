@@ -1,69 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewpoint">
-    <title>Run Python Script</title>
+    <title>Convert Data</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" rel="stylesheet">
+    <link href="/web/favicon.png" rel="icon" type="image/png">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        form {
-            background: white;
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        input[type="text"],
-        input[type="number"],
-        select {
-            width: calc(100% - 22px);
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        .submit-button {
-            background-color: #5c6bc0;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .submit-button:hover {
-            background-color: #3949ab;
-        }
-
-        label {
-            display: block;
-            color: #333;
-        }
-
         .terminal {
             background: #232323;
             color: #FFFFFF;
             font-family: monospace;
             padding: 10px;
             overflow-y: scroll;
+            position: sticky;
+            top: 100%;
             height: 500px;
-            white-space: pre-wrap;
         }
 
         .line {
@@ -82,96 +35,229 @@
         }
     </style>
 </head>
-
 <body>
 
-    <h1>Convert To Precomputed</h1>
+<!-- 标题栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Convert To Precomputed</a>
+        <button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+                data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>
 
-    <form id="params-form">
-        <label for="imagePath">Image Path (/path/to/image)</label>
-        <input id="imagePath" name="imagePath" required type="text"><br><br>
+<!-- 页面的主体部分 -->
+<div class="container-fluid mt-3">
+    <div class="row">
+        <!-- 侧边栏 -->
+        <div class="col-md-2">
+            <div aria-orientation="vertical" class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
+                <a aria-controls="v-pills-home" aria-selected="true" class="nav-link active"
+                   data-bs-target="#pane-simple-image"
+                   data-bs-toggle="pill" id="nav-link-simple-image" role="tab">Simple Image</a>
+                <a aria-controls="v-pills-profile" aria-selected="false" class="nav-link"
+                   data-bs-target="#pane-labeled-image"
+                   data-bs-toggle="pill" id="nav-link-labeled-image" role="tab">Labeled Image</a>
+                <a aria-controls="v-pills-profile" aria-selected="false" class="nav-link"
+                   data-bs-target="#pane-annotation"
+                   data-bs-toggle="pill" id="nav-link-annotation" role="tab">Annotation</a>
+            </div>
+        </div>
+        <!-- 主内容区 -->
+        <div class="col-md-10">
+            <div class="tab-content" id="v-pills-tabContent">
+                <!-- Simple的内容 -->
+                <div aria-labelledby="v-pills-home-tab" class="tab-pane fade show active" id="pane-simple-image"
+                     role="tabpanel">
 
-        <label for="outputDirectory">Output Directory (/path/to/outputDir)</label>
-        <input id="outputDirectory" name="outputDirectory" required type="text"><br><br>
+                    <h1 class="my-4">Simple Image</h1>
 
-        <label for="resolutionX">Resolution X (nm)</label>
-        <input id="resolutionX" name="resolutionX" required type="number"><br><br>
-        <label for="resolutionY">Resolution Y (nm)</label>
-        <input id="resolutionY" name="resolutionY" required type="number"><br><br>
-        <label for="resolutionZ">Resolution Z (nm)</label>
-        <input id="resolutionZ" name="resolutionZ" required type="number"><br><br>
+                    <form class="row g-3" id="simple-image-params-form">
+                        <div class="col-6">
+                            <label class="form-label" for="simple-image-path">Image Path (/path/to/image)</label>
+                            <input class="form-control" id="simple-image-path" name="image_path" required type="text">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="simple-image-output-directory">Output Directory
+                                (/path/to/outputDir)</label>
+                            <input class="form-control" id="simple-image-output-directory" name="output_directory"
+                                   required type="text">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="simple-image-resolution-x">Resolution X (nm)</label>
+                            <input class="form-control" id="simple-image-resolution-x" name="resolution_x" required
+                                   type="number">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="simple-image-resolution-y">Resolution Y (nm)</label>
+                            <input class="form-control" id="simple-image-resolution-y" name="resolution_y" required
+                                   type="number">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="simple-image-resolution-z">Resolution Z (nm)</label>
+                            <input class="form-control" id="simple-image-resolution-z" name="resolution_z" required
+                                   type="number">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="simple-image-write-blockSize">Write Block Size (default
+                                1024)</label>
+                            <input class="form-control" id="simple-image-write-blockSize" name="write_block_size"
+                                   type="number">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="simple-image-resume">Resume</label>
+                            <select class="form-select" id="simple-image-resume" name="resume">
+                                <option selected value="true">Resume (default)</option>
+                                <option value="false">Start New</option>
+                            </select>
+                        </div>
+                        <div class="col-12 text-center">
+                            <input class="btn btn-primary" type="submit" value="Convert">
+                        </div>
+                    </form>
 
-        <label for="writeBlockSize">Write Block Size (default 512)</label>
-        <input id="writeBlockSize" name="writeBlockSize" type="number"><br><br>
+                    <div class="terminal" id="simple-image-terminal" style="margin-top: 10px"></div>
+                </div>
+                <!-- Labeled Image 的内容 -->
+                <div aria-labelledby="v-pills-profile-tab" class="tab-pane fade" id="pane-labeled-image"
+                     role="tabpanel">
 
-        <label for="resume">Resume</label>
-        <select id="resume" name="resume">
-            <option selected value="true">Resume (default)</option>
-            <option value="false">Start New</option>
-        </select><br><br>
+                    <h1 class="my-4">Labeled Image</h1>
 
-        <input type="submit" value="Convert">
-    </form>
+                    <form class="row g-3" id="labeled-image-params-form">
+                        <div class="col-6">
+                            <label class="form-label" for="labeled-image-path">Image Path (/path/to/image)</label>
+                            <input class="form-control" id="labeled-image-path" name="image" required type="text">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="labeled-image-output-directory">Output Directory
+                                (/path/to/outputDir)</label>
+                            <input class="form-control" id="labeled-image-output-directory" name="output_directory"
+                                   required type="text">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="labeled-image-resolution-x">Resolution X (nm)</label>
+                            <input class="form-control" id="labeled-image-resolution-x" name="resolution_x"
+                                   type="number">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="labeled-image-resolution-y">Resolution Y (nm)</label>
+                            <input class="form-control" id="labeled-image-resolution-y" name="resolution_y"
+                                   type="number">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="labeled-image-resolution-z">Resolution Z (nm)</label>
+                            <input class="form-control" id="labeled-image-resolution-z" name="resolution_z"
+                                   type="number">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="labeled-image-width">Width</label>
+                            <input class="form-control" id="labeled-image-width" name="width" type="number">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="labeled-image-height">Height</label>
+                            <input class="form-control" id="labeled-image-height" name="height" type="number">
+                        </div>
+                        <div class="col-12 text-center">
+                            <input class="btn btn-primary" type="submit" value="Convert">
+                        </div>
+                    </form>
 
-    <div class="terminal" id="terminal"></div>
+                    <div class="terminal" id="labeled-image-terminal" style="margin-top: 10px"></div>
 
-    <script>
-        'use strict';
+                </div>
 
-        function addLine(line) {
-            const terminalDiv = document.getElementById('terminal');
-            const lineElement = document.createElement('div');
-            lineElement.className = 'line';
+                <!-- Annotation 的内容 -->
+                <div aria-labelledby="v-pills-profile-tab" class="tab-pane fade" id="pane-annotation" role="tabpanel">
 
-            const lineNumber = terminalDiv.childNodes.length + 1;
-            const lineNoSpan = document.createElement('span');
-            lineNoSpan.className = 'line-no';
-            lineNoSpan.textContent = lineNumber + ':';
-            lineElement.appendChild(lineNoSpan);
+                    <h1 class="my-4">Annotation</h1>
 
-            const lineContentSpan = document.createElement('span');
-            lineContentSpan.className = 'line-content';
-            lineContentSpan.textContent = line;
-            lineElement.appendChild(lineContentSpan);
+                    <form class="row g-3" id="annotation-params-form">
+                        <div class="col-12 d-flex flex-row ">
+                            <div class="form-check me-3">
+                                <input checked class="form-check-input" id="annotation-type-atlas-ellipsoid"
+                                       name="annotation_type" type="radio" value="atlas-ellipsoid">
+                                <label class="form-check-label" for="annotation-type-atlas-ellipsoid">Atlas
+                                    Ellipsoid</label>
+                            </div>
+                            <div class="form-check me-3">
+                                <input class="form-check-input" id="annotation-type-box" name="annotation_type"
+                                       type="radio" value="box">
+                                <label class="form-check-label" for="annotation-type-box">Box</label>
+                            </div>
+                            <div class="form-check me-3">
+                                <input class="form-check-input" id="annotation-type-ellipsoid" name="annotation_type"
+                                       type="radio" value="ellipsoid">
+                                <label class="form-check-label" for="annotation-type-ellipsoid">Ellipsoid</label>
+                            </div>
+                            <div class="form-check me-3">
+                                <input class="form-check-input" id="annotation-type-line" name="annotation_type"
+                                       type="radio" value="line">
+                                <label class="form-check-label" for="annotation-type-line">Line</label>
+                            </div>
+                            <div class="form-check me-3">
+                                <input class="form-check-input" id="annotation-type-sphere" name="annotation_type"
+                                       type="radio" value="sphere">
+                                <label class="form-check-label" for="annotation-type-sphere">Sphere</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="annotation-input-file">Input File</label>
+                            <input class="form-control" id="annotation-input-file" name="input_file"
+                                   placeholder="/path/to/input" required type="text">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="annotation-target-directory">Target Directory</label>
+                            <input class="form-control" id="annotation-target-directory" name="output_directory"
+                                   placeholder="/path/to/target/directory" required type="text">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="annotation-lower-bound">Lower Bound</label>
+                            <input class="form-control" id="annotation-lower-bound" name="lower_bound"
+                                   placeholder="[0, 0, 0]" required type="text">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="annotation-upper-bound">Upper Bound</label>
+                            <input class="form-control" id="annotation-upper-bound" name="upper_bound"
+                                   placeholder="[1000, 1000, 1000]" required type="text">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="annotation-resolution">Resolution in m</label>
+                            <input class="form-control" id="annotation-resolution" name="resolution"
+                                   placeholder="[8e-9, 8e-9, 8e-9]" required type="text">
+                        </div>
+                        <div class="col-6">
+                            <input class="form-check-input" id="annotation-generate-index" name="generate_index"
+                                   type="checkbox">
+                            <label class="form-label" for="annotation-generate-index">Generate Index</label>
+                            <div class="form-text">Whether to generate encoded respresentation for each single
+                                annotation and save it in a separate file. It will be used by Neuroglancer when
+                                selecting or hovering over an annotation.
+                            </div>
+                        </div>
+                        <div class="col-12 text-center">
+                            <input class="btn btn-primary" type="submit" value="Convert">
+                        </div>
+                    </form>
 
-            terminalDiv.appendChild(lineElement);
-            terminalDiv.scrollTop = terminalDiv.scrollHeight;
-        }
+                    <div class="terminal" id="annotation-terminal" style="margin-top: 10px"></div>
 
-        document.getElementById('params-form').addEventListener('submit', (event) => {
-            event.preventDefault();
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-            const formData = new FormData(event.target);
-            const params = {
-                imagePath: formData.get('imagePath'),
-                outputDirectory: formData.get('outputDirectory'),
-                resolutionX: formData.get('resolutionX'),
-                resolutionY: formData.get('resolutionY'),
-                resolutionZ: formData.get('resolutionZ'),
-                writeBlockSize: formData.get('writeBlockSize'),
-                resume: formData.get('resume'),
-            };
-            const queryParams = Object.entries(params).filter(([_, value]) => value && value.trim() !== '').map(([key, value]) =>
-                encodeURIComponent(key) + '=' + encodeURIComponent(value)).join('&');
-
-            const eventSource = new EventSource('/run?' + queryParams);
-            eventSource.addEventListener('message', (event) => {
-                addLine(event.data);
-            })
-            eventSource.addEventListener('error', (event) => {
-                addLine('Error!');
-                eventSource.close();
-            })
-            eventSource.addEventListener('done', (event) => {
-                addLine('Done!');
-                eventSource.close();
-            })
-            window.onbeforeunload = () => {
-                eventSource.close();
-            }
-        })
-    </script>
-
+<script crossorigin="anonymous"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/web/main.js"></script>
+<script>
+    registerEventSource("simple-image-params-form", "simple-image-terminal", "/api/convert-simple-image");
+    registerEventSource("labeled-image-params-form", "labeled-image-terminal", "/api/convert-labeled-image");
+    registerEventSource("annotation-params-form", "annotation-terminal", "/api/convert-annotation");
+</script>
 </body>
-
 </html>

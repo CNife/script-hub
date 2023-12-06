@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 from pathlib import Path, PurePosixPath
@@ -18,7 +19,7 @@ app.mount("/web", StaticFiles(directory=CWD / "web"), name="web")
 
 @app.get("/")
 def index():
-    return RedirectResponse("/web/index-bootstrap.html")
+    return RedirectResponse("/web/index.html")
 
 
 @app.get("/api/convert-simple-image")
@@ -85,6 +86,40 @@ def convert_labeled_image(
     cmd.append(str(BASE_PATH / image.lstrip("/")))
 
     return response_stream(cmd, env={"PYTHONPATH": str(script_dir)})
+
+
+SCRIPTS = {
+    "atlas-ellipsoid": "atlasEllipsoidAnnotation.mjs",
+    "box": "boxAnnotation.mjs",
+    "ellipsoid": "ellipsoidAnnotation.mjs",
+    "line": "lineAnnotation.mjs",
+    "sphere": "sphereAnnotation.mjs",
+}
+NODE_EXE = os.environ.get("NODE_EXE", "node")
+
+
+@app.get("/api/convert-annotation")
+def convert_annotation(
+    annotation_type: Annotated[str, Query()],
+    output_directory: Annotated[str, Query()],
+    resolution: Annotated[str, Query()],
+    lower_bound: Annotated[str, Query()],
+    upper_bound: Annotated[str, Query()],
+    generate_index: Annotated[bool, Query()],
+) -> StreamingResponse:
+    script_dir = CWD / "scripts" / "convert-to-neuroglancer" / "node"
+    script = script_dir / SCRIPTS[annotation_type]
+    cmd = [
+        NODE_EXE,
+        str(script),
+        f"--infoFile={BASE_PATH/output_directory.lstrip('/')}",
+        f"--resolution={resolution}",
+        f"--lowerBound={lower_bound}",
+        f"--upperBound={upper_bound}",
+        f"--targetDir={BASE_PATH/output_directory.lstrip('/')}",
+        f"--generateIndex={generate_index}",
+    ]
+    return response_stream(cmd, cwd=script_dir)
 
 
 def response_stream(cmd: list[str], **kwargs) -> StreamingResponse:
