@@ -77,10 +77,10 @@ def convert_labeled_image(
         str(BASE_PATH / output_directory.lstrip("/")),
     ]
     if width is not None:
-        cmd.append("-w")
+        cmd.append("-width")
         cmd.append(str(width))
     if height is not None:
-        cmd.append("-h")
+        cmd.append("-height")
         cmd.append(str(height))
     cmd.append(str(BASE_PATH / image.lstrip("/")))
 
