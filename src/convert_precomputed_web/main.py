@@ -1,14 +1,14 @@
-import os.path
 import subprocess
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Iterator, Annotated
 
 from fastapi import FastAPI, Query
 from fastapi.responses import StreamingResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-CWD: Path = Path(__file__).parent.parent.parent
+CWD = Path(__file__).parent.parent.parent
+BASE_PATH = PurePosixPath("/zjbs-data/share")
 
 app = FastAPI()
 
@@ -29,25 +29,7 @@ def convert_simple_image(
     resolution_z: Annotated[int, Query()],
     resume: Annotated[bool, Query()],
     write_block_size: Annotated[int, Query()] = 1024,
-):
-    return StreamingResponse(
-        execute_script(
-            image_path, output_directory, resolution_x, resolution_y, resolution_z, write_block_size, resume
-        ),
-        media_type="text/event-stream",
-    )
-
-
-def execute_script(
-    image_path: str,
-    output_directory: str,
-    resolution_x: int,
-    resolution_y: int,
-    resolution_z: int,
-    write_block_size: int,
-    resume: bool,
-) -> Iterator[str]:
-    base_path = "/zjbs-data/share"
+) -> StreamingResponse:
     cmd = [
         sys.executable,
         "-m",
@@ -56,7 +38,7 @@ def execute_script(
         "--base-url",
         "http://10.11.140.35:2000",
         "--base-path",
-        base_path,
+        str(BASE_PATH),
     ]
     if write_block_size is not None:
         cmd.append("--write-block-size")
@@ -64,26 +46,54 @@ def execute_script(
     cmd.extend(
         [
             "--resume" if resume else "--no-resume",
-            os.path.join(base_path, image_path.lstrip("/")),
-            os.path.join(base_path, output_directory.lstrip("/")),
+            str(BASE_PATH / image_path.lstrip("/")),
+            str(BASE_PATH / output_directory.lstrip("/")),
             str(resolution_x),
             str(resolution_y),
             str(resolution_z),
         ]
     )
-    process = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        encoding="UTF-8",
-        env={"PYTHONPATH": str(CWD / "src")},
-    )
+    return response_stream(cmd, env={"PYTHONPATH": str(CWD / "src")})
+
+
+@app.get("/api/convert-labeled-image")
+def convert_labeled_image(
+    image: Annotated[str, Query()],
+    output_directory: Annotated[str, Query()],
+    resolution_x: Annotated[int, Query()] = 1,
+    resolution_y: Annotated[int, Query()] = 1,
+    resolution_z: Annotated[int, Query()] = 1,
+    width: Annotated[int | None, Query()] = None,
+    height: Annotated[int | None, Query()] = None,
+) -> StreamingResponse:
+    script_dir = CWD / "src" / "labeled_image_to_precomputed"
+    cmd = [
+        sys.executable,
+        str(script_dir / "labeled_image_to_precomputed.py"),
+        "-r",
+        f"{resolution_x},{resolution_y},{resolution_z}",
+        "-d",
+        str(BASE_PATH / output_directory.lstrip("/")),
+    ]
+    if width is not None:
+        cmd.append("-w")
+        cmd.append(str(width))
+    if height is not None:
+        cmd.append("-h")
+        cmd.append(str(height))
+    cmd.append(str(BASE_PATH / image.lstrip("/")))
+
+    return response_stream(cmd, env={"PYTHONPATH": str(script_dir)})
+
+
+def response_stream(cmd: list[str], **kwargs) -> StreamingResponse:
+    return StreamingResponse(execute_script(cmd, **kwargs), media_type="text/event-stream")
+
+
+def execute_script(cmd: list[str], **kwargs) -> Iterator[str]:
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, **kwargs)
     for line in process.stdout:
-        yield f"data: {line}\n\n"
+        yield f"data: {line}\n"
 
     code = process.wait()
-    if code != 0:
-        yield f"data: Failed, code: {code}\n\n"
-    else:
-        yield f"event: done\ndata: done\n\n"
+    yield f"event: done\ndata: Finished with return code: {code}\n\n"

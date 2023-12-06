@@ -1,9 +1,14 @@
-function addTerminalLine(terminalId, line) {
+function clearTerminal(terminalId) {
     const terminalDiv = document.getElementById(terminalId);
+    terminalDiv.innerHTML = '';
+}
+
+function addTerminalLine(terminalId, line) {
+    const terminal = document.getElementById(terminalId);
     const lineElement = document.createElement('div');
     lineElement.className = 'line';
 
-    const lineNumber = terminalDiv.childNodes.length + 1;
+    const lineNumber = terminal.childNodes.length + 1;
     const lineNoSpan = document.createElement('span');
     lineNoSpan.className = 'line-no';
     lineNoSpan.textContent = lineNumber + ':';
@@ -14,8 +19,8 @@ function addTerminalLine(terminalId, line) {
     lineContentSpan.textContent = line;
     lineElement.appendChild(lineContentSpan);
 
-    terminalDiv.appendChild(lineElement);
-    terminalDiv.scrollTop = terminalDiv.scrollHeight;
+    terminal.appendChild(lineElement);
+    terminal.scrollTop = terminal.scrollHeight;
 }
 
 function getFormData(form) {
@@ -41,6 +46,7 @@ function registerEventSource(formId, terminalId, endpoint) {
     const form = document.getElementById(formId);
     form.addEventListener('submit', (event) => {
         event.preventDefault();
+        clearTerminal(terminalId);
 
         const formData = getFormData(form);
         console.log(`formData: ${JSON.stringify(formData)}`);
@@ -56,6 +62,7 @@ function registerEventSource(formId, terminalId, endpoint) {
             eventSource.close();
         });
         eventSource.addEventListener('done', (event) => {
+            addTerminalLine(terminalId, event.data);
             addTerminalLine(terminalId, 'Done!');
             eventSource.close();
         });

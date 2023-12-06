@@ -68,7 +68,7 @@
                 <div aria-labelledby="v-pills-home-tab" class="tab-pane fade show active" id="v-pills-home"
                      role="tabpanel">
 
-                    <h1 class="my-4">Convert To Precomputed</h1>
+                    <h1 class="my-4">Simple Image</h1>
 
                     <form class="row g-3" id="simple-image-params-form">
                         <div class="col-6">
@@ -76,29 +76,35 @@
                             <input class="form-control" id="simple-image-path" name="image_path" required type="text">
                         </div>
                         <div class="col-6">
-                            <label class="form-label" for="outputDirectory">Output Directory
+                            <label class="form-label" for="simple-image-output-directory">Output Directory
                                 (/path/to/outputDir)</label>
-                            <input class="form-control" id="outputDirectory" name="output_directory" required type="text">
+                            <input class="form-control" id="simple-image-output-directory" name="output_directory"
+                                   required type="text">
                         </div>
                         <div class="col-4">
-                            <label class="form-label" for="resolutionX">Resolution X (nm)</label>
-                            <input class="form-control" id="resolutionX" name="resolution_x" required type="number">
+                            <label class="form-label" for="simple-image-resolution-x">Resolution X (nm)</label>
+                            <input class="form-control" id="simple-image-resolution-x" name="resolution_x" required
+                                   type="number">
                         </div>
                         <div class="col-4">
-                            <label class="form-label" for="resolutionY">Resolution Y (nm)</label>
-                            <input class="form-control" id="resolutionY" name="resolution_y" required type="number">
+                            <label class="form-label" for="simple-image-resolution-y">Resolution Y (nm)</label>
+                            <input class="form-control" id="simple-image-resolution-y" name="resolution_y" required
+                                   type="number">
                         </div>
                         <div class="col-4">
-                            <label class="form-label" for="resolutionZ">Resolution Z (nm)</label>
-                            <input class="form-control" id="resolutionZ" name="resolution_z" required type="number">
+                            <label class="form-label" for="simple-image-resolution-z">Resolution Z (nm)</label>
+                            <input class="form-control" id="simple-image-resolution-z" name="resolution_z" required
+                                   type="number">
                         </div>
                         <div class="col-4">
-                            <label class="form-label" for="writeBlockSize">Write Block Size (default 1024)</label>
-                            <input class="form-control" id="writeBlockSize" name="write_block_size" type="number">
+                            <label class="form-label" for="simple-image-write-blockSize">Write Block Size (default
+                                1024)</label>
+                            <input class="form-control" id="simple-image-write-blockSize" name="write_block_size"
+                                   type="number">
                         </div>
                         <div class="col-4">
-                            <label class="form-label" for="resume">Resume</label>
-                            <select class="form-select" id="resume" name="resume">
+                            <label class="form-label" for="simple-image-resume">Resume</label>
+                            <select class="form-select" id="simple-image-resume" name="resume">
                                 <option selected value="true">Resume (default)</option>
                                 <option value="false">Start New</option>
                             </select>
@@ -110,10 +116,52 @@
 
                     <div class="terminal" id="simple-image-terminal" style="margin-top: 10px"></div>
                 </div>
-                <!-- 子页面2的内容 -->
+                <!-- Labeled Image 的内容 -->
                 <div aria-labelledby="v-pills-profile-tab" class="tab-pane fade" id="v-pills-profile" role="tabpanel">
-                    <h2>子页面2</h2>
-                    <p>这里是子页面2的内容...</p>
+
+                    <h1 class="my-4">Simple Image</h1>
+
+                    <form class="row g-3" id="labeled-image-params-form">
+                        <div class="col-6">
+                            <label class="form-label" for="labeled-image-path">Image Path (/path/to/image)</label>
+                            <input class="form-control" id="labeled-image-path" name="image" required type="text">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="labeled-image-output-directory">Output Directory
+                                (/path/to/outputDir)</label>
+                            <input class="form-control" id="labeled-image-output-directory" name="output_directory"
+                                   required type="text">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="labeled-image-resolution-x">Resolution X (nm)</label>
+                            <input class="form-control" id="labeled-image-resolution-x" name="resolution_x"
+                                   type="number">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="labeled-image-resolution-y">Resolution Y (nm)</label>
+                            <input class="form-control" id="labeled-image-resolution-y" name="resolution_y"
+                                   type="number">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="labeled-image-resolution-z">Resolution Z (nm)</label>
+                            <input class="form-control" id="labeled-image-resolution-z" name="resolution_z"
+                                   type="number">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="labeled-image-width">Width</label>
+                            <input class="form-control" id="labeled-image-width" name="width" type="number">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="labeled-image-height">Height</label>
+                            <input class="form-control" id="labeled-image-height" name="height" type="number">
+                        </div>
+                        <div class="col-12 text-center">
+                            <input class="btn btn-primary" type="submit" value="Convert">
+                        </div>
+                    </form>
+
+                    <div class="terminal" id="labeled-image-terminal" style="margin-top: 10px"></div>
+
                 </div>
             </div>
         </div>
@@ -126,6 +174,7 @@
 <script src="/web/main.js"></script>
 <script>
     registerEventSource("simple-image-params-form", "simple-image-terminal", "/api/convert-simple-image");
+    registerEventSource("labeled-image-params-form", "labeled-image-terminal", "/api/convert-labeled-image");
 </script>
 </body>
 </html>
