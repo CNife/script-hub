@@ -6,6 +6,7 @@ from typing import Iterator, Annotated
 from fastapi import FastAPI, Query
 from fastapi.responses import StreamingResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from loguru import logger
 
 CWD = Path(__file__).parent.parent.parent
 BASE_PATH = PurePosixPath("/zjbs-data/share")
@@ -91,6 +92,7 @@ def response_stream(cmd: list[str], **kwargs) -> StreamingResponse:
 
 
 def execute_script(cmd: list[str], **kwargs) -> Iterator[str]:
+    logger.info(f"cmd={' '.join(cmd)}")
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, **kwargs)
     for line in process.stdout:
         yield f"data: {line}\n"
