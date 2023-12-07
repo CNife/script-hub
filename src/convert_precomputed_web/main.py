@@ -90,10 +90,10 @@ def convert_labeled_image(
 
 SCRIPTS = {
     "atlas-ellipsoid": "atlasEllipsoidAnnotation.mjs",
-    "box": "boxAnnotation.mjs",
-    "ellipsoid": "ellipsoidAnnotation.mjs",
-    "line": "lineAnnotation.mjs",
-    "sphere": "sphereAnnotation.mjs",
+    "box": "boxAnnotations.mjs",
+    "ellipsoid": "ellipsoidAnnotations.mjs",
+    "line": "lineAnnotations.mjs",
+    "sphere": "sphereAnnotations.mjs",
 }
 NODE_EXE = os.environ.get("NODE_EXE", "node")
 
