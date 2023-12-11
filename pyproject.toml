@@ -5,7 +5,9 @@ description = "Add your description here"
 authors = [
     { name = "蔡涛", email = "caitao@zhejianglab.com" }
 ]
-dependencies = []
+dependencies = [
+    "fastapi[all]>=0.104.1",
+]
 readme = "README.md"
 requires-python = ">= 3.8"
 license = { text = "GPL-3.0-only" }
@@ -20,3 +22,42 @@ dev-dependencies = []
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.ruff]
+src = ["src"]
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    ".pytest_cache",
+    ".data",
+    "dist",
+]
+line-length = 120
+indent-width = 4
+target-version = "py310"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = true
+line-ending = "lf"
+
+[tool.ruff.isort]
+known-local-folder = ["zjbs_file_client"]
+
+[tool.ruff.lint]
+fixable = ["ALL"]
+unfixable = []
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.black]
+line-length = 120
+target-version = ["py310"]
+skip-magic-trailing-comma = true
+
+[tool.isort]
+profile = "black"
+line_length = 120
+src_paths = ["src"]

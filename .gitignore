@@ -11,3 +11,6 @@ wheels/
 
 .idea/
 .run/
+
+# pnpm
+pnpm-lock.yaml

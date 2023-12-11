@@ -1,0 +1,17 @@
+name: convert_precomputed_web
+channels:
+  - fenglab
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - zimg
+  - loguru
+  - typer
+  - pip:
+      - tensorstore
+      - pydantic==2.*
+      - deprecation
+      - fastapi
+      - uvicorn
+      - neuroglancer_scripts
