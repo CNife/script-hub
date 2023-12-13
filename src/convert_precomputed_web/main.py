@@ -1,4 +1,3 @@
-import os
 import subprocess
 import sys
 from pathlib import Path, PurePosixPath
@@ -10,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
 CWD = Path(__file__).parent.parent.parent
-BASE_PATH = PurePosixPath("/zjbs-data/share")
+SCRIPT_DIR = CWD / "scripts"
 
 app = FastAPI()
 
@@ -20,6 +19,9 @@ app.mount("/web", StaticFiles(directory=CWD / "web"), name="web")
 @app.get("/")
 def index():
     return RedirectResponse("/web/index.html")
+
+
+BASE_PATH = PurePosixPath("/zjbs-data/share")
 
 
 @app.get("/api/convert-simple-image")
@@ -55,7 +57,9 @@ def convert_simple_image(
             str(resolution_z),
         ]
     )
-    return response_stream(cmd, env={"PYTHONPATH": str(CWD / "src")})
+
+    python_path = SCRIPT_DIR / "convert-simple-image"
+    return response_stream(cmd, env={"PYTHONPATH": str(python_path)})
 
 
 @app.get("/api/convert-labeled-image")
@@ -68,7 +72,7 @@ def convert_labeled_image(
     width: Annotated[int | None, Query()] = None,
     height: Annotated[int | None, Query()] = None,
 ) -> StreamingResponse:
-    script_dir = CWD / "src" / "labeled_image_to_precomputed"
+    script_dir = SCRIPT_DIR / "convert-to-neuroglancer" / "python"
     cmd = [
         sys.executable,
         str(script_dir / "labeled_image_to_precomputed.py"),
@@ -94,8 +98,8 @@ SCRIPTS = {
     "ellipsoid": "ellipsoidAnnotations.mjs",
     "line": "lineAnnotations.mjs",
     "sphere": "sphereAnnotations.mjs",
+    "point": "pointAnnotation.mjs"
 }
-NODE_EXE = os.environ.get("NODE_EXE", "node")
 
 
 @app.get("/api/convert-annotation")
@@ -107,10 +111,10 @@ def convert_annotation(
     upper_bound: Annotated[str, Query()],
     generate_index: Annotated[bool, Query()],
 ) -> StreamingResponse:
-    script_dir = CWD / "scripts" / "convert-to-neuroglancer" / "node"
+    script_dir = SCRIPT_DIR / "convert-to-neuroglancer" / "node"
     script = script_dir / SCRIPTS[annotation_type]
     cmd = [
-        NODE_EXE,
+        "node",
         str(script),
         f"--infoFile={BASE_PATH/output_directory.lstrip('/')}",
         f"--resolution={resolution}",
