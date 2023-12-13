@@ -98,6 +98,7 @@ SCRIPTS = {
     "ellipsoid": "ellipsoidAnnotations.mjs",
     "line": "lineAnnotations.mjs",
     "sphere": "sphereAnnotations.mjs",
+    "point": "pointAnnotation.mjs"
 }
 
 
