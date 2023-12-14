@@ -1,0 +1,11 @@
+version: "3.9"
+name: script_hub_dev
+
+services:
+
+  queue:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: redis-cli ping

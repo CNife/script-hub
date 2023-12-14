@@ -8,6 +8,8 @@ from fastapi.responses import StreamingResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
+from script_hub.task_queue import start_worker, stop_worker
+
 CWD = Path(__file__).parent.parent.parent
 SCRIPT_DIR = CWD / "scripts"
 
@@ -18,7 +20,12 @@ app.mount("/web", StaticFiles(directory=CWD / "web"), name="web")
 
 @app.on_event("startup")
 def startup():
-    subprocess.run(["celery", "-A", "script_hub"])
+    start_worker()
+
+
+@app.on_event("shutdown")
+def shutdown():
+    stop_worker()
 
 
 @app.get("/")
