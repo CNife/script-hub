@@ -1,4 +1,4 @@
 [submodule "scripts/convert-to-neuroglancer"]
 	path = scripts/convert-to-neuroglancer
-	url = https://github.com/wynnewu-project/convert-to-neuroglancer
+	url = https://github.com/CaiTao-ZJLab/convert-to-neuroglancer
 	branch = main

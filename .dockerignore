@@ -1,0 +1,13 @@
+# git
+.git/
+
+# python
+__pycache__/
+.venv/
+
+# pycharm
+.idea/
+.run/
+
+# node.js
+node_modules/

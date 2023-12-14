@@ -1,0 +1,5 @@
+broker_url = "redis://redis:6379/1"
+celery_result_backend = "redis://redis:6379/2"
+celery_timezone = "Asia/Shanghai"
+celery_task_serializer = "json"
+celery_result_serializer = "json"

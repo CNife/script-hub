@@ -16,6 +16,11 @@ app = FastAPI()
 app.mount("/web", StaticFiles(directory=CWD / "web"), name="web")
 
 
+@app.on_event("startup")
+def startup():
+    subprocess.run(["celery", "-A", "script_hub"])
+
+
 @app.get("/")
 def index():
     return RedirectResponse("/web/index.html")
@@ -98,7 +103,7 @@ SCRIPTS = {
     "ellipsoid": "ellipsoidAnnotations.mjs",
     "line": "lineAnnotations.mjs",
     "sphere": "sphereAnnotations.mjs",
-    "point": "pointAnnotation.mjs"
+    "point": "pointAnnotation.mjs",
 }
 
 

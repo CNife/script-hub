@@ -1,4 +1,4 @@
-name: convert_precomputed_web
+name: script_hub
 channels:
   - fenglab
   - defaults
@@ -8,6 +8,7 @@ dependencies:
   - zimg
   - loguru
   - typer
+  - celery
   - pip:
       - tensorstore
       - pydantic==2.*

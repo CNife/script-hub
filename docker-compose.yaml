@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+
+  script-hub:
+    build: .
+    ports:
+      - "2100:80"
+    volumes:
+      - /zjbs-data/share:/data
+    depends_on:
+      - queue
+    healthcheck:
+      test: CMD curl --fail http://localhost/docs
+
+  queue:
+    image: redis:alpine
+    volumes:
+      - celery-data:/data
+    healthcheck:
+      test: CMD redis-cli ping
+
+  flower:
+    image: mher/flower
+    command: flower --broker=redis://queue:6379/1
+    ports:
+      - "5555:5555"
+    depends_on:
+      - script-hub
+    healthcheck:
+      test: CMD curl --fail http://localhost:5555
+
+
+volumes:
+  celery-data:
