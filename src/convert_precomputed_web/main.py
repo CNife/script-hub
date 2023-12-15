@@ -101,6 +101,7 @@ NODE_EXE = os.environ.get("NODE_EXE", "node")
 @app.get("/api/convert-annotation")
 def convert_annotation(
     annotation_type: Annotated[str, Query()],
+    input_file: Annotated[str, Query()],
     output_directory: Annotated[str, Query()],
     resolution: Annotated[str, Query()],
     lower_bound: Annotated[str, Query()],
@@ -112,7 +113,7 @@ def convert_annotation(
     cmd = [
         NODE_EXE,
         str(script),
-        f"--infoFile={BASE_PATH/output_directory.lstrip('/')}",
+        f"--infoFile={BASE_PATH/input_file.lstrip('/')}",
         f"--resolution={resolution}",
         f"--lowerBound={lower_bound}",
         f"--upperBound={upper_bound}",
