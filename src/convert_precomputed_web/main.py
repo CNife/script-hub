@@ -98,7 +98,8 @@ SCRIPTS = {
     "ellipsoid": "ellipsoidAnnotations.mjs",
     "line": "lineAnnotations.mjs",
     "sphere": "sphereAnnotations.mjs",
-    "point": "pointAnnotation.mjs"
+    "point": "pointAnnotation.mjs",
+    "cone": "coneAnnotation.mjs",
 }
 
 
@@ -110,7 +111,7 @@ def convert_annotation(
     resolution: Annotated[str, Query()],
     lower_bound: Annotated[str, Query()],
     upper_bound: Annotated[str, Query()],
-    generate_index: Annotated[bool, Query()],
+    generate_index: Annotated[str, Query()],
 ) -> StreamingResponse:
     script_dir = SCRIPT_DIR / "convert-to-neuroglancer" / "node"
     script = script_dir / SCRIPTS[annotation_type]
